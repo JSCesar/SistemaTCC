@@ -1,11 +1,11 @@
-from PyQt5 import QtCore, QtWidgets, QtGui
 import cv2
 import numpy as np
-from src.QrCodeReader import QrCodeReader
+from PyQt5 import QtWidgets, QtGui
+
 from src.ObjectSize import ObjectSize
+from src.QrCodeReader import QrCodeReader
 from src.Serial import ControleSerial
-from Util.States import States
-import serial
+
 
 class VideoBehavior(QtWidgets.QWidget):
     def __init__(self, parent=None):
@@ -15,26 +15,52 @@ class VideoBehavior(QtWidgets.QWidget):
         self._width = 2
         self._min_size = (30, 30)
         self.qrReader = QrCodeReader()
-        self.controleSerial = ControleSerial()
+        #self.controleSerial = ControleSerial()
         self.err = 0.01
 
     def image_data_slot(self, image_data):
 
         #print(image_data)
-        image = cv2.imread(image_data, cv2.IMREAD_GRAYSCALE)
-        qrcode = self.qrReader.read(image_data)
+        image = cv2.imread('./../img/teste.png')
+        qrcode = self.qrReader.read(image)
         if qrcode != None:
             #verifica posicao da camera
-            if self.verificaPosicao(qrcode):
+             #self.verificaPosicao(qrcode):
                 #inicia o objeto para recuperar tamanho da imagem através da webcam
-                objSize = ObjectSize(image_data,1)
+                objSize = ObjectSize(image, 1)
+                #array de objetos encontrados na cena
                 objs = objSize.getSize()
-                file = '../../img/'+qrcode[0]
-                modelSize = objSize.getSize(file,1)
+                #file = '../../img/' + qrcode[0]
+                file = qrcode[0]
+                modelSize = objSize.getSize(file, 1)
                 model = objSize.getSize(file)
+                #print('modelSize' + str(modelSize))
+                #print('model' + str(model))
+                '''cv2.rectangle(image,
+                              (modelSize[0][1][0][0], modelSize[0][1][0][1]),
+                              (modelSize[0][1][2][0], modelSize[0][1][2][1]),
+                              (255, 0, 0)
+                              )'''
+                #modelSize são as bordas do dado
+                for ob in modelSize:
+                    for pt in ob:
+                        if type(pt) is np.ndarray:
+                            cv2.rectangle(image, (pt[0][0], pt[0][1]), (pt[2][0], pt[2][1]), (0, 255, 0))
+                #model são os desenhos do dado
+                for ob in model:
+                    for pt in ob:
+                        if type(pt) is np.ndarray:
+                            cv2.rectangle(image, (pt[0][0], pt[0][1]), (pt[2][0], pt[2][1]), (0, 255, 0))
+                        if type(pt) is tuple:
+                            cv2.circle(image, (int(pt[0]), int(pt[1])), 5, (0, 255, 0))
+
+
+                cv2.rectangle(image, (objs[-1][1][0][0], objs[-1][1][0][1]), ( objs[-1][1][2][0],objs[-1][1][2][1] ), (0, 0, 255))
+                cv2.circle(image, (int(objs[-1][2][0]), int(objs[-1][2][1])) , 5, (255,0,0))
+
         else:
             cv2.rectangle(image_data, (0, 0), (100, 100), (0, 0, 255))
-        self.image = self.get_qimage(image_data)
+        self.image = self.get_qimage(image)
 
         if self.image.size() != self.size():
             self.setFixedSize(self.image.size())

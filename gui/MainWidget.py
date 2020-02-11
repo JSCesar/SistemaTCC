@@ -1,13 +1,15 @@
-from PyQt5 import QtCore, QtWidgets, QtGui
-from src.VideoBehavior import VideoBehavior
+from PyQt5 import QtWidgets
+
 from gui.recordVideo import RecordVideo
+from src.VideoBehavior import VideoBehavior
+
 
 class MainWidget(QtWidgets.QWidget):
         def __init__(self, parent=None):
                 super().__init__(parent)
                 self.videoBehavior = VideoBehavior()
                 # TODO: set video port
-                self.record_video = RecordVideo(1)
+                self.record_video = RecordVideo(0)
                 self.run_button = QtWidgets.QPushButton('Start')
 
                 # Connect the image data signal and slot together

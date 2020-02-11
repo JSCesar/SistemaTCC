@@ -1,5 +1,7 @@
 import serial
+
 from Util.States import States
+
 
 class ControleSerial:
     def __init__(self):

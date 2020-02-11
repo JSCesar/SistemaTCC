@@ -3,14 +3,14 @@
 # python object_size.py --image images/example_02.png --width 0.955
 # python object_size.py --image images/example_03.png --width 3.5
 
+import cv2
+import imutils
+import numpy as np
+from imutils import contours
+from imutils import perspective
 # import the necessary packages
 from scipy.spatial import distance as dist
-from imutils import perspective
-from imutils import contours
-import numpy as np
-import argparse
-import imutils
-import cv2
+
 
 def midpoint(ptA, ptB):
 	return ((ptA[0] + ptB[0]) * 0.5, (ptA[1] + ptB[1]) * 0.5)
