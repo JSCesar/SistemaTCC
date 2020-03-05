@@ -22,42 +22,53 @@ class VideoBehavior(QtWidgets.QWidget):
 
         #print(image_data)
         image = cv2.imread('./../img/teste.png')
-        qrcode = self.qrReader.read(image)
+        qrcode, box, retImage = self.qrReader.read(image)
         if qrcode != None:
+            cv2.rectangle(image, (box[0][0][0], box[0][0][1]), (box[2][0][0], box[2][0][1]), (255, 0, 255))
             #verifica posicao da camera
-             #self.verificaPosicao(qrcode):
-                #inicia o objeto para recuperar tamanho da imagem através da webcam
-                objSize = ObjectSize(image, 1)
-                #array de objetos encontrados na cena
-                objs = objSize.getSize()
-                #file = '../../img/' + qrcode[0]
-                file = qrcode[0]
-                modelSize = objSize.getSize(file, 1)
-                model = objSize.getSize(file)
-                #print('modelSize' + str(modelSize))
-                #print('model' + str(model))
-                '''cv2.rectangle(image,
-                              (modelSize[0][1][0][0], modelSize[0][1][0][1]),
-                              (modelSize[0][1][2][0], modelSize[0][1][2][1]),
-                              (255, 0, 0)
-                              )'''
-                #modelSize são as bordas do dado
-                for ob in modelSize:
-                    for pt in ob:
-                        if type(pt) is np.ndarray:
-                            cv2.rectangle(image, (pt[0][0], pt[0][1]), (pt[2][0], pt[2][1]), (0, 255, 0))
-                #model são os desenhos do dado
-                for ob in model:
-                    for pt in ob:
-                        if type(pt) is np.ndarray:
-                            cv2.rectangle(image, (pt[0][0], pt[0][1]), (pt[2][0], pt[2][1]), (0, 255, 0))
-                        if type(pt) is tuple:
-                            cv2.circle(image, (int(pt[0]), int(pt[1])), 5, (0, 255, 0))
+            #self.verificaPosicao(qrcode):
+            #inicia o objeto para recuperar tamanho da imagem através da webcam
+            objSize = ObjectSize(image, 1)
+            #pixelPermetric 1 centímetro
+            objSize.setPixelPerMetric(box, 1)
+            #array de objetos encontrados na cena
+            objs, so = objSize.getSize()
+            #file = '../../img/' + qrcode[0]
+            file = qrcode
+            modelSize, sp = objSize.getSize(file, 1)
+            model, ss = objSize.getSize(file)
+            #print('modelSize' + str(modelSize))
+            #print('model' + str(model))
+            '''cv2.rectangle(image,
+                          (modelSize[0][1][0][0], modelSize[0][1][0][1]),
+                          (modelSize[0][1][2][0], modelSize[0][1][2][1]),
+                          (255, 0, 0)
+                          )'''
+            #modelSize são as bordas do dado
+            for ob in modelSize:
+                for pt in ob:
+                    if type(pt) is np.ndarray:
+                        cv2.rectangle(image, (pt[0][0], pt[0][1]), (pt[2][0], pt[2][1]), (0, 255, 0))
+                    if type(pt) is tuple:
+                        cv2.circle(image, (int(pt[0]), int(pt[1])), 5, (0, 255, 0))
 
+            #model são os desenhos do dado
+            '''for ob in model:
+                for pt in ob:
+                    if type(pt) is np.ndarray:
+                        cv2.rectangle(image, (pt[0][0], pt[0][1]), (pt[2][0], pt[2][1]), (0, 255, 0))
+                    if type(pt) is tuple:
+                        cv2.circle(image, (int(pt[0]), int(pt[1])), 5, (0, 255, 0))
+            '''
 
-                cv2.rectangle(image, (objs[-1][1][0][0], objs[-1][1][0][1]), ( objs[-1][1][2][0],objs[-1][1][2][1] ), (0, 0, 255))
-                cv2.circle(image, (int(objs[-1][2][0]), int(objs[-1][2][1])) , 5, (255,0,0))
-
+            #objs -1 é a última borda que foi encontrada
+            cv2.rectangle(image, (objs[-1][1][0][0], objs[-1][1][0][1]), ( objs[-1][1][2][0],objs[-1][1][2][1] ), (0, 0, 255))
+            cv2.circle(image, (int(objs[-1][2][0]), int(objs[-1][2][1])) , 5, (255,0,0))
+            for obj in objs:
+                for el in obj:
+                    #print(el)
+                    if type(obj) is np.ndarray:
+                        cv2.rectangle(image, (el[0][0], el[0][1]), (el[2][0], el[2][1]), 10, (0,50,50))
         else:
             cv2.rectangle(image_data, (0, 0), (100, 100), (0, 0, 255))
         self.image = self.get_qimage(image)

@@ -10,6 +10,8 @@ class ObjectSize:
     def __init__(self,image,objReferencia):
         self.image = image
         self.objReferencia = objReferencia
+        self.pixelPerMetric = None
+        self.realWorldMeasure = None
 
     def midpoint(self,ptA, ptB):
         return ((ptA[0] + ptB[0]) * 0.5, (ptA[1] + ptB[1]) * 0.5)
@@ -89,6 +91,7 @@ class ObjectSize:
             (tlblX, tlblY) = self.midpoint(tl, bl)
             (trbrX, trbrY) = self.midpoint(tr, br)
 
+            #center
             mid = self.midpoint(tl, br)
 
             # compute the Euclidean distance between the midpoints
@@ -107,4 +110,21 @@ class ObjectSize:
 
             obj.append(mid)
             objList.append(obj)
-        return objList
+
+        return objList, edged.shape
+
+    def distanciaEuclidiana(self, pt1, pt2):
+        return dist.euclidean(pt1, pt2)
+
+    def getPixelPerMetric(self):
+        return self.pixelPerMetric
+
+    def setPixelPerMetric(self, objRef, realWorldMeasure):
+        qtdPixel = self.distanciaEuclidiana((objRef[0][0][0], objRef[0][0][1]), (objRef[3][0][0], objRef[3][0][1]))
+        self.realWorldMeasure = realWorldMeasure
+        self.pixelPerMetric = qtdPixel / realWorldMeasure
+
+    def getProporcao(self, qtdPixel):
+        print(self.realWorldMeasure)
+        print(self.pixelPerMetric)
+        return (qtdPixel * self.realWorldMeasure) / self.pixelPerMetric
