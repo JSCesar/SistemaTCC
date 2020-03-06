@@ -60,7 +60,6 @@ class ObjectSize:
             if cv2.contourArea(c) < 100:
                 continue
             obj = []
-            obj.append('obj')
             # compute the rotated bounding box of the contour
             orig = self.image.copy()
             box = cv2.minAreaRect(c)
@@ -98,17 +97,17 @@ class ObjectSize:
             dA = dist.euclidean((tltrX, tltrY), (blbrX, blbrY))
             dB = dist.euclidean((tlblX, tlblY), (trbrX, trbrY))
 
-            # if the pixels per metric has not been initialized, then
-            # compute it as the ratio of pixels to supplied metric
-            # (in this case, inches)
-            if pixelsPerMetric is None:
-                pixelsPerMetric = dB / self.objReferencia
-
             # compute the size of the object
-            dimA = dA / pixelsPerMetric
-            dimB = dB / pixelsPerMetric
+            #distancia em cruz do objeto
+            dimA = dA / self.getPixelPerMetric()
+            dimB = dB / self.getPixelPerMetric()
 
             obj.append(mid)
+            dim = {
+                    'pixel': { 'vertical' : dA, 'horizontal' : dB },
+                    'real' : { 'vertical' : dimA , 'horizontal' : dimB }
+                    }
+            obj.append(dim)
             objList.append(obj)
 
         return objList, edged.shape
